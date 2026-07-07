@@ -1,6 +1,57 @@
-import os
+import pandas as pd
+from sqlalchemy import create_engine
+from pathlib import Path
+import config
+from .clean_data import clean_product, clean_sales, clean_targets
+
+# Change these if needed
+USERNAME = config.DB_USER
+PASSWORD = config.DB_PASSWORD
+HOST = "localhost"
+PORT = 5432
+DATABASE = "adventureworks"
+
+engine = create_engine(
+    f"postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+)
+
+data_folder = Path("data/raw")
+
+files = {
+    "product": "Product.csv",
+    "sales": "Sales.csv",
+    "region": "Region.csv",
+    "reseller": "Reseller.csv",
+    "salesperson": "Salesperson.csv",
+    "salespersonregion": "SalespersonRegion.csv",
+    "targets": "Targets.csv"
+}
+
+for table, file in files.items():
+    print(f"Importing {table}...")
+
+    df = pd.read_csv(data_folder / file, sep="\t")
 
 
-def import_to_postgres(csv_path: str) -> None:
-    print(f"Import placeholder for {csv_path}")
-    os.makedirs("data/processed", exist_ok=True)
+    if table == "product":
+        df = clean_product(df)
+
+    elif table == "sales":
+        df = clean_sales(df)
+
+    elif table == "targets":
+        df = clean_targets(df)
+
+    df.columns = (
+    df.columns
+      .str.strip()
+      .str.lower()
+      .str.replace(" ", "_")
+      .str.replace("-", "_")
+    )
+
+    df.to_sql(table, engine, if_exists="replace", index=False)
+
+
+
+print("Done!")

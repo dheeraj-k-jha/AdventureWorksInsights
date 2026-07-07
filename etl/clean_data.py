@@ -1,11 +1,31 @@
-from pathlib import Path
+import pandas as pd
 
 
-def clean_raw_data(input_path: str, output_path: str) -> None:
-    input_file = Path(input_path)
-    output_file = Path(output_path)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    if input_file.exists():
-        output_file.write_text(input_file.read_text())
-    else:
-        output_file.write_text("")
+# helper function
+def money_to_float(series):
+    return (
+        series
+        .str.replace("$", "", regex=False)
+        .str.replace(",", "", regex=False)
+        .astype(float)
+    )
+
+
+# converting text to float for product
+def clean_product(df):
+    df["Standard Cost"] = money_to_float(df["Standard Cost"])
+    return df
+
+
+def clean_sales(df):
+    df["Unit Price"] = money_to_float(df["Unit Price"])
+    df["Sales"] = money_to_float(df["Sales"])
+    df["Cost"] = money_to_float(df["Cost"])
+    df["OrderDate"] = pd.to_datetime(df["OrderDate"])
+    return df
+
+
+def clean_targets(df):
+    df["Target"] = money_to_float(df["Target"])
+    df["TargetMonth"] = pd.to_datetime(df["TargetMonth"])
+    return df

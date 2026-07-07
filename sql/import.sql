@@ -1,4 +1,0 @@
--- Placeholder import statements for future data loading
--- Example:
--- COPY sales(order_date, revenue, region, product_name, salesperson)
--- FROM '/path/to/data.csv' DELIMITER ',' CSV HEADER;
