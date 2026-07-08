@@ -4,19 +4,15 @@ from pathlib import Path
 import config
 from .clean_data import clean_product, clean_sales, clean_targets
 
-# Change these if needed
-USERNAME = config.DB_USER
-PASSWORD = config.DB_PASSWORD
-HOST = "localhost"
-PORT = 5432
-DATABASE = "adventureworks"
-
+# Credentials:
 engine = create_engine(
-    f"postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+    f"postgresql+psycopg2://{config.DB_USER}:{config.DB_PASSWORD}"
+    f"@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
+    connect_args={"sslmode": "require"}
 )
 
 data_folder = Path("data/raw")
-
+    
 files = {
     "product": "Product.csv",
     "sales": "Sales.csv",
